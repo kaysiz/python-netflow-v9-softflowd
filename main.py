@@ -18,10 +18,14 @@ import sys
 import socketserver
 import threading
 import time
+from celery import Celery
 
 from netflow import parse_packet, TemplateNotRecognized, UnknownNetFlowVersion
 
 logger = logging.getLogger(__name__)
+
+# celery instance
+app = Celery('tasks', backend='amqp', broker='amqp://')
 
 # Amount of time to wait before dropping an undecodable ExportPacket
 PACKET_TIMEOUT = 60 * 60
@@ -167,6 +171,11 @@ def get_export_packets(host, port):
         listener.join()
 
 
+@app.task
+def tasks_test(x, y):
+    return x + y
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="A sample netflow collector.")
     parser.add_argument("--host", type=str, default="0.0.0.0",
@@ -207,7 +216,9 @@ if __name__ == "__main__":
                 "flows": [flow.data for flow in export.flows]}
             }
             line = json.dumps(entry).encode() + b"\n"  # byte encoded line
-            # open as append, not reading the whole file
+            TODO:  # call the analyser from gere
+
+                # open and append, not reading the whole file
             with gzip.open(args.output_file, "ab") as fh:
                 fh.write(line)
     except KeyboardInterrupt:

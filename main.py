@@ -32,7 +32,8 @@ RawPacket = namedtuple('RawPacket', ['ts', 'client', 'data'])
 class QueuingRequestHandler(socketserver.BaseRequestHandler):
     def handle(self):
         data = self.request[0]  # get content, [1] would be the socket
-        self.server.queue.put(RawPacket(time.time(), self.client_address, data))
+        self.server.queue.put(
+            RawPacket(time.time(), self.client_address, data))
         logger.debug(
             "Received %d bytes of data from %s", len(data), self.client_address
         )
@@ -42,6 +43,7 @@ class QueuingUDPListener(socketserver.ThreadingUDPServer):
     """A threaded UDP server that adds a (time, data) tuple to a queue for
     every request it sees
     """
+
     def __init__(self, interface, queue):
         self.queue = queue
         super().__init__(interface, QueuingRequestHandler)
@@ -117,7 +119,8 @@ class NetFlowListener(threading.Thread):
                     continue
                 except TemplateNotRecognized:
                     if time.time() - pkt.ts > PACKET_TIMEOUT:
-                        logger.warning("Dropping an old and undecodable v9 ExportPacket")
+                        logger.warning(
+                            "Dropping an old and undecodable v9 ExportPacket")
                     else:
                         to_retry.append(pkt)
                         logger.debug("Failed to decode a v9 ExportPacket - will "
@@ -177,7 +180,8 @@ if __name__ == "__main__":
                         help="Enable debug output")
     args = parser.parse_args()
 
-    logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(message)s")
+    logging.basicConfig(level=logging.INFO,
+                        stream=sys.stdout, format="%(message)s")
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
@@ -203,7 +207,9 @@ if __name__ == "__main__":
                 "flows": [flow.data for flow in export.flows]}
             }
             line = json.dumps(entry).encode() + b"\n"  # byte encoded line
-            with gzip.open(args.output_file, "ab") as fh:  # open as append, not reading the whole file
+            print(line)
+            # open as append, not reading the whole file
+            with gzip.open(args.output_file, "ab") as fh:
                 fh.write(line)
     except KeyboardInterrupt:
         logger.info("Received KeyboardInterrupt, passing through")

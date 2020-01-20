@@ -173,7 +173,7 @@ def get_export_packets(host, port):
 
 
 @app.task
-def tasks_test(x, y):
+def add(x, y):
     return x + y
 
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
                 "flows": [flow.data for flow in export.flows]}
             }
             line = json.dumps(entry).encode() + b"\n"  # byte encoded line
-            tasks_test.delay(randint(0, 1000), randint(0, 1000))
+            add.delay(randint(0, 1000), randint(0, 1000))
             # open and append, not reading the whole file
             with gzip.open(args.output_file, "ab") as fh:
                 fh.write(line)

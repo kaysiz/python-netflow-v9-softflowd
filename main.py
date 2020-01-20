@@ -18,15 +18,12 @@ import sys
 import socketserver
 import threading
 import time
-from celery import Celery
+from tasks import add
 from random import randint
 
 from netflow import parse_packet, TemplateNotRecognized, UnknownNetFlowVersion
 
 logger = logging.getLogger(__name__)
-
-# celery instance
-app = Celery('tasks', backend='amqp', broker='amqp://')
 
 # Amount of time to wait before dropping an undecodable ExportPacket
 PACKET_TIMEOUT = 60 * 60
@@ -170,11 +167,6 @@ def get_export_packets(host, port):
     finally:
         listener.stop()
         listener.join()
-
-
-@app.task
-def add(x, y):
-    return x + y
 
 
 if __name__ == "__main__":

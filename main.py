@@ -207,7 +207,6 @@ if __name__ == "__main__":
                 "flows": [flow.data for flow in export.flows]}
             }
             line = json.dumps(entry).encode() + b"\n"  # byte encoded line
-            print(line)
             # open as append, not reading the whole file
             with gzip.open(args.output_file, "ab") as fh:
                 fh.write(line)

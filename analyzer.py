@@ -45,6 +45,7 @@ class Connection:
     'src' describes the peer which sends more data towards the other. This
     does NOT have to mean that 'src' was the initiator of the connection.
     """
+
     def __init__(self, flow1, flow2):
         if not flow1 or not flow2:
             raise Exception("A connection requires two flows")
@@ -84,7 +85,8 @@ class Connection:
         if self.duration < 0:
             # 32 bit int has its limits. Handling overflow here
             # TODO: Should be handled in the collection phase
-            self.duration = (2**32 - src['FIRST_SWITCHED']) + src['LAST_SWITCHED']
+            self.duration = (
+                2**32 - src['FIRST_SWITCHED']) + src['LAST_SWITCHED']
 
     def __repr__(self):
         return "<Connection from {} to {}, size {}>".format(
@@ -155,7 +157,8 @@ class Connection:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Output a basic analysis of NetFlow data")
+    parser = argparse.ArgumentParser(
+        description="Output a basic analysis of NetFlow data")
     parser.add_argument('-f', '--file', dest='file', type=str, default=sys.stdin,
                         help="The file to analyze (defaults to stdin if not provided)")
     parser.add_argument('-p', '--packets', dest='packets_threshold', type=int, default=10,
@@ -179,12 +182,14 @@ if __name__ == "__main__":
         for line in gzipped:
             entry = json.loads(line)
             if len(entry.keys()) != 1:
-                logger.warning("Line \"{}\" does not have exactly one timestamp key.")
+                logger.warning(
+                    "Line \"{}\" does not have exactly one timestamp key.")
 
             try:
                 ts = list(entry)[0]  # timestamp from key
             except KeyError:
-                logger.error("Saved line \"{}\" has no timestamp key!".format(line))
+                logger.error(
+                    "Saved line \"{}\" has no timestamp key!".format(line))
                 continue
 
             data[ts] = entry[ts]
@@ -199,7 +204,8 @@ if __name__ == "__main__":
     skipped_threshold = args.packets_threshold
 
     for key in sorted(data):
-        timestamp = datetime.fromtimestamp(float(key)).strftime("%Y-%m-%d %H:%M.%S")
+        timestamp = datetime.fromtimestamp(
+            float(key)).strftime("%Y-%m-%d %H:%M.%S")
         client = data[key]["client"]
         flows = data[key]["flows"]
 
@@ -214,7 +220,7 @@ if __name__ == "__main__":
                 pending[first_switched] = {}
 
             # Find the peer for this connection
-            if flow["IP_PROTOCOL_VERSION"] == 4:
+            if 'IPV4_SRC_ADDR' in flow:
                 local_peer = flow["IPV4_SRC_ADDR"]
                 remote_peer = flow["IPV4_DST_ADDR"]
             else:
@@ -236,16 +242,18 @@ if __name__ == "__main__":
                 skipped += 1
                 continue
 
-            print("{timestamp}: {service:<14} | {size:8} | {duration:9} | {packets:5} | Between {src_host} ({src}) and {dest_host} ({dest})" \
+            print("{timestamp}: {service:<14} | {size:8} | {duration:9} | {packets:5} | Between {src_host} ({src}) and {dest_host} ({dest})"
                   .format(timestamp=timestamp, service=con.service.upper(), src_host=con.hostnames.src, src=con.src,
                           dest_host=con.hostnames.dest, dest=con.dest, size=con.human_size, duration=con.human_duration,
                           packets=con.total_packets))
 
     if skipped > 0:
-        print(f"{skipped} connections skipped, because they had less than {skipped_threshold} packets.")
+        print(
+            f"{skipped} connections skipped, because they had less than {skipped_threshold} packets.")
 
     if len(pending) > 0:
-        print(f"There are {len(pending)} first_switched entries left in the pending dict!")
+        print(
+            f"There are {len(pending)} first_switched entries left in the pending dict!")
         all_noise = True
         for first_switched, flows in sorted(pending.items(), key=lambda x: x[0]):
             for peer, flow in flows.items():
@@ -254,10 +262,12 @@ if __name__ == "__main__":
                     continue
                 all_noise = False
 
-                if flow["IP_PROTOCOL_VERSION"] == 4:
-                    print(first_switched, peer, flow["IPV4_DST_ADDR"], flow["IN_PKTS"])
+                if 'IPV4_SRC_ADDR' in flow:
+                    print(first_switched, peer,
+                          flow["IPV4_DST_ADDR"], flow["IN_PKTS"])
                 else:
-                    print(first_switched, peer, flow["IPV6_DST_ADDR"], flow["IN_PKTS"])
+                    print(first_switched, peer,
+                          flow["IPV6_DST_ADDR"], flow["IN_PKTS"])
 
         if all_noise:
             print("They were all noise!")

@@ -157,6 +157,9 @@ class Connection:
 
 
 def packet_analysis(line):
+    parser = argparse.ArgumentParser(
+        description="Output a basic analysis of NetFlow data")
+    args = parser.parse_args()
     mode = "rb"  # reading files
 
     data = {}

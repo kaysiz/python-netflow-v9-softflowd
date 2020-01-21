@@ -208,8 +208,8 @@ if __name__ == "__main__":
                 "client": client,
                 "flows": [flow.data for flow in export.flows]}
             }
-            line = json.dumps(entry).encode() + b"\n"  # byte encoded line
-            analyse.delay(line)
+            # line = json.dumps(entry).encode() + b"\n"  # byte encoded line
+            analyse.delay(entry)
             # open and append, not reading the whole file
             # with gzip.open(args.output_file, "ab") as fh:
             #     fh.write(line)

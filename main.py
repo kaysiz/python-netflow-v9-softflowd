@@ -18,7 +18,7 @@ import sys
 import socketserver
 import threading
 import time
-from tasks import add
+from tasks import analyse
 from random import randint
 
 from netflow import parse_packet, TemplateNotRecognized, UnknownNetFlowVersion
@@ -209,10 +209,10 @@ if __name__ == "__main__":
                 "flows": [flow.data for flow in export.flows]}
             }
             line = json.dumps(entry).encode() + b"\n"  # byte encoded line
-            add.delay(randint(0, 1000), randint(0, 1000))
+            analyse.delay(line)
             # open and append, not reading the whole file
-            with gzip.open(args.output_file, "ab") as fh:
-                fh.write(line)
+            # with gzip.open(args.output_file, "ab") as fh:
+            #     fh.write(line)
     except KeyboardInterrupt:
         logger.info("Received KeyboardInterrupt, passing through")
         pass

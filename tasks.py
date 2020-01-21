@@ -1,7 +1,7 @@
 from celery import Celery
 
 # celery instance
-app = Celery('tasks', backend='amqp', broker='amqp://admin')
+app = Celery()
 
 
 @app.task

@@ -161,7 +161,7 @@ def packet_analysis(line):
 
     data = {}
 
-    entry = line
+    entry = json.loads(line)
     if len(entry.keys()) != 1:
         logger.warning(
             "Line \"{}\" does not have exactly one timestamp key.")

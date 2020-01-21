@@ -156,43 +156,24 @@ class Connection:
         return self.src_flow["IN_PKTS"] + self.dest_flow["IN_PKTS"]
 
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Output a basic analysis of NetFlow data")
-    parser.add_argument('-f', '--file', dest='file', type=str, default=sys.stdin,
-                        help="The file to analyze (defaults to stdin if not provided)")
-    parser.add_argument('-p', '--packets', dest='packets_threshold', type=int, default=10,
-                        help="Number of packets representing the lower bound in connections to be processed")
-    args = parser.parse_args()
-
-    # Using a file and using stdin differ in their further usage for gzip.open
-    file = args.file
+def packet_analysis(line):
     mode = "rb"  # reading files
-    if file != sys.stdin and not os.path.exists(file):
-        exit("File {} does not exist!".format(file))
-
-    if file == sys.stdin:
-        file = sys.stdin.buffer
-        mode = "rt"  # reading from stdin
 
     data = {}
 
-    with gzip.open(file, mode) as gzipped:
-        # "for line in" lazy-loads all lines in the file
-        for line in gzipped:
-            entry = json.loads(line)
-            if len(entry.keys()) != 1:
-                logger.warning(
-                    "Line \"{}\" does not have exactly one timestamp key.")
+    entry = json.loads(line)
+    if len(entry.keys()) != 1:
+        logger.warning(
+            "Line \"{}\" does not have exactly one timestamp key.")
 
-            try:
-                ts = list(entry)[0]  # timestamp from key
-            except KeyError:
-                logger.error(
-                    "Saved line \"{}\" has no timestamp key!".format(line))
-                continue
+    try:
+        ts = list(entry)[0]  # timestamp from key
+    except KeyError:
+        logger.error(
+            "Saved line \"{}\" has no timestamp key!".format(line))
+        continue
 
-            data[ts] = entry[ts]
+    data[ts] = entry[ts]
 
     # Go through data and dissect every flow saved inside the dump
 

@@ -159,6 +159,8 @@ class Connection:
 def packet_analysis(line):
     parser = argparse.ArgumentParser(
         description="Output a basic analysis of NetFlow data")
+    parser.add_argument('-p', '--packets', dest='packets_threshold', type=int, default=10,
+                        help="Number of packets representing the lower bound in connections to be processed")
     args = parser.parse_args()
     mode = "rb"  # reading files
 

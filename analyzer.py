@@ -157,11 +157,7 @@ class Connection:
 
 
 def packet_analysis(line):
-    parser = argparse.ArgumentParser(
-        description="Output a basic analysis of NetFlow data")
-    parser.add_argument('-p', '--packets', dest='packets_threshold', type=int, default=10,
-                        help="Number of packets representing the lower bound in connections to be processed")
-    args = parser.parse_args()
+    args = 10
     mode = "rb"  # reading files
 
     data = {}
@@ -186,7 +182,7 @@ def packet_analysis(line):
     # insert this flow, waiting for its peer. If found, take the waiting peer and create a Connection object.
     pending = {}
     skipped = 0
-    skipped_threshold = args.packets_threshold
+    skipped_threshold = args
 
     for key in sorted(data):
         timestamp = datetime.fromtimestamp(

@@ -171,7 +171,6 @@ def packet_analysis(line):
     except KeyError:
         logger.error(
             "Saved line \"{}\" has no timestamp key!".format(line))
-        continue
 
     data[ts] = entry[ts]
 

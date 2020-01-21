@@ -204,12 +204,12 @@ if __name__ == "__main__":
         # This also means that the files have to be handled differently, because they are gzipped and not formatted as
         # one single big JSON dump, but rather many little JSON dumps, separated by line breaks.
         for ts, client, export in get_export_packets(args.host, args.port):
-            entry = {"ts": {
+            entry = {ts: {
                 "client": client,
                 "flows": [flow.data for flow in export.flows]}
             }
             # line = json.dumps(entry).encode() + b"\n"  # byte encoded line
-            analyse.delay(entry)
+            analyse.delay(json.dumps(entry))
             # open and append, not reading the whole file
             # with gzip.open(args.output_file, "ab") as fh:
             #     fh.write(line)
